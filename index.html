@@ -1,0 +1,1162 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stoke Shop - Магазин аккаунтов</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #0f0f0f;
+            --bg-secondary: #1a1a1a;
+            --bg-card: #2d2d2d;
+            --text-primary: #ffffff;
+            --text-secondary: #b0b0b0;
+            --accent: #667eea;
+            --accent-hover: #764ba2;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --border: #404040;
+            --shadow: rgba(0, 0, 0, 0.3);
+        }
+
+        [data-theme="light"] {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8f9fa;
+            --bg-card: #ffffff;
+            --text-primary: #1a1a1a;
+            --text-secondary: #666666;
+            --accent: #667eea;
+            --accent-hover: #764ba2;
+            --success: #059669;
+            --warning: #d97706;
+            --danger: #dc2626;
+            --border: #e5e5e5;
+            --shadow: rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            transition: all 0.3s ease;
+        }
+
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+            background: var(--bg-card);
+            padding: 20px;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            box-shadow: 0 8px 25px var(--shadow);
+            position: relative;
+        }
+
+        .logo {
+            width: 80px;
+            height: 80px;
+            border-radius: 20px;
+            margin: 0 auto 15px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 32px;
+            font-weight: bold;
+            border: 3px solid var(--accent);
+            box-shadow: 0 4px 15px var(--shadow);
+        }
+
+        .logo-img {
+            width: 100%;
+            height: 100%;
+            border-radius: 20px;
+            object-fit: cover;
+        }
+
+        .balance-card {
+            background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+            color: white;
+            padding: 25px;
+            border-radius: 20px;
+            margin-bottom: 20px;
+            text-align: center;
+            box-shadow: 0 8px 25px var(--shadow);
+            border: 1px solid var(--accent);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .balance-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+            transform: rotate(45deg);
+            animation: shine 3s infinite;
+        }
+
+        @keyframes shine {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+
+        .balance-amount {
+            font-size: 42px;
+            font-weight: 800;
+            margin: 10px 0;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+
+        .nav-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .nav-card {
+            background: var(--bg-card);
+            padding: 20px;
+            border-radius: 16px;
+            text-align: center;
+            text-decoration: none;
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 15px var(--shadow);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            transition: left 0.5s;
+        }
+
+        .nav-card:hover::before {
+            left: 100%;
+        }
+
+        .nav-card:active {
+            transform: scale(0.95);
+        }
+
+        .nav-icon {
+            font-size: 28px;
+            margin-bottom: 12px;
+            font-weight: 300;
+        }
+
+        .category-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .category-card {
+            background: var(--bg-card);
+            padding: 20px;
+            border-radius: 16px;
+            text-align: center;
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 15px var(--shadow);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .category-card:active {
+            transform: scale(0.95);
+        }
+
+        .category-icon {
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 12px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            font-weight: 600;
+            box-shadow: 0 4px 15px var(--shadow);
+            border: 2px solid rgba(255,255,255,0.2);
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+
+        .product-card {
+            background: var(--bg-card);
+            padding: 20px;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 15px var(--shadow);
+            transition: all 0.3s ease;
+        }
+
+        .product-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px var(--shadow);
+        }
+
+        .product-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 12px;
+        }
+
+        .product-price {
+            font-weight: 700;
+            color: var(--accent);
+            font-size: 20px;
+            font-weight: 800;
+        }
+
+        .product-stock {
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .buy-button {
+            background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+            color: white;
+            border: none;
+            padding: 14px 24px;
+            border-radius: 12px;
+            width: 100%;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 12px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px var(--shadow);
+            border: 1px solid var(--accent);
+        }
+
+        .buy-button:active {
+            transform: scale(0.98);
+        }
+
+        .back-button {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+            padding: 12px 20px;
+            border-radius: 12px;
+            width: 100%;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .back-button:active {
+            transform: scale(0.98);
+        }
+
+        .payment-methods {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        .payment-method {
+            background: var(--bg-card);
+            padding: 18px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            cursor: pointer;
+            border: 1px solid var(--border);
+            transition: all 0.3s ease;
+        }
+
+        .payment-method:active {
+            transform: scale(0.98);
+        }
+
+        .payment-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+            font-weight: 700;
+            box-shadow: 0 4px 15px var(--shadow);
+        }
+
+        .wallet-address {
+            background: var(--bg-secondary);
+            padding: 16px;
+            border-radius: 12px;
+            margin: 16px 0;
+            word-break: break-all;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        .copy-button {
+            background: var(--success);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            width: 100%;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px var(--shadow);
+        }
+
+        .copy-button:active {
+            transform: scale(0.98);
+        }
+
+        .theme-switcher {
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            background: var(--bg-card);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 15px var(--shadow);
+            cursor: pointer;
+            border: 1px solid var(--border);
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        .language-switcher {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--bg-card);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 15px var(--shadow);
+            cursor: pointer;
+            border: 1px solid var(--border);
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        .theme-switcher:active, .language-switcher:active {
+            transform: scale(0.9);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-secondary);
+        }
+
+        .referral-section {
+            background: var(--bg-card);
+            padding: 24px;
+            border-radius: 16px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 15px var(--shadow);
+        }
+
+        .referral-link {
+            background: var(--bg-secondary);
+            padding: 16px;
+            border-radius: 12px;
+            margin: 12px 0;
+            word-break: break-all;
+            font-family: 'Courier New', monospace;
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        input, select, textarea {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 12px;
+            width: 100%;
+            font-size: 16px;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            color: var(--text-primary);
+            font-weight: 700;
+        }
+
+        p {
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        /* Анимации */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease;
+        }
+
+        /* Специфичные стили для символов */
+        .symbol-telegram { background: linear-gradient(135deg, #0088cc, #00a8ff); }
+        .symbol-vk { background: linear-gradient(135deg, #4c75a3, #5a7faf); }
+        .symbol-vinted { background: linear-gradient(135deg, #ff6b6b, #ff8e8e); }
+        .symbol-wallapop { background: linear-gradient(135deg, #4ecdc4, #56d4cb); }
+        .symbol-facebook { background: linear-gradient(135deg, #1877f2, #1a7dff); }
+        .symbol-stars { background: linear-gradient(135deg, #ffd700, #ffdf33); }
+        .symbol-premium { background: linear-gradient(135deg, #9b59b6, #a66bbe); }
+        .symbol-yandex { background: linear-gradient(135deg, #ffcc00, #ffd633); }
+        .symbol-ozon { background: linear-gradient(135deg, #005bff, #0066ff); }
+        .symbol-wildberries { background: linear-gradient(135deg, #ff6b35, #ff7b4a); }
+        .symbol-gosuslugi { background: linear-gradient(135deg, #2ecc71, #34d179); }
+
+        .symbol-ton { background: linear-gradient(135deg, #0088cc, #00a8ff); }
+        .symbol-usdt { background: linear-gradient(135deg, #26a17b, #2cb48c); }
+        .symbol-ltc { background: linear-gradient(135deg, #bfbbbb, #cecaca); }
+        .symbol-btc { background: linear-gradient(135deg, #f7931a, #f8a33e); }
+        .symbol-sol { background: linear-gradient(135deg, #00ffbd, #33ffca); }
+        .symbol-usdc { background: linear-gradient(135deg, #2775ca, #3a82d4); }
+        .symbol-crypto-bot { background: linear-gradient(135deg, #0088cc, #00a8ff); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Главный экран -->
+        <div id="mainScreen" class="fade-in">
+            <div class="header">
+                <div class="logo" id="logo">
+                    <!-- Логотип будет загружен через JS -->
+                </div>
+                <h1>Stoke Shop</h1>
+                <p>Премиум магазин аккаунтов</p>
+            </div>
+
+            <div class="balance-card">
+                <div style="font-size: 14px; opacity: 0.9;">Ваш баланс</div>
+                <div class="balance-amount" id="balanceAmount">$0.00</div>
+                <button class="buy-button" onclick="showScreen('depositScreen')">Пополнить баланс</button>
+            </div>
+
+            <div class="nav-grid">
+                <div class="nav-card" onclick="showScreen('categoriesScreen')">
+                    <div class="nav-icon">📂</div>
+                    <div>Категории</div>
+                </div>
+                <div class="nav-card" onclick="showScreen('favoritesScreen')">
+                    <div class="nav-icon">★</div>
+                    <div>Избранное</div>
+                </div>
+                <div class="nav-card" onclick="showScreen('ordersScreen')">
+                    <div class="nav-icon">📦</div>
+                    <div>Заказы</div>
+                </div>
+                <div class="nav-card" onclick="showScreen('referralScreen')">
+                    <div class="nav-icon">👥</div>
+                    <div>Рефералы</div>
+                </div>
+            </div>
+
+            <div class="nav-grid">
+                <div class="nav-card" onclick="showScreen('giveawayScreen')">
+                    <div class="nav-icon">🎯</div>
+                    <div>Розыгрыш</div>
+                </div>
+                <div class="nav-card" onclick="showScreen('aboutScreen')">
+                    <div class="nav-icon">ℹ</div>
+                    <div>О магазине</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Экран категорий -->
+        <div id="categoriesScreen" class="hidden">
+            <button class="back-button" onclick="showScreen('mainScreen')">← Назад</button>
+            <h2 style="margin-bottom: 20px;">Категории</h2>
+            <div class="category-grid" id="categoriesGrid">
+                <!-- Категории будут загружены через JS -->
+            </div>
+        </div>
+
+        <!-- Экран товаров категории -->
+        <div id="productsScreen" class="hidden">
+            <button class="back-button" onclick="showScreen('categoriesScreen')">← Назад</button>
+            <h2 style="margin-bottom: 20px;" id="categoryTitle">Товары</h2>
+            <div class="products-grid" id="productsGrid">
+                <!-- Товары будут загружены через JS -->
+            </div>
+        </div>
+
+        <!-- Экран товара -->
+        <div id="productScreen" class="hidden">
+            <button class="back-button" onclick="goBackToProducts()">← Назад</button>
+            <div class="product-card">
+                <div class="product-header">
+                    <h3 id="productName">Название товара</h3>
+                    <div class="product-price" id="productPrice">$0.00</div>
+                </div>
+                <div class="product-stock" id="productStock">В наличии: 0 шт.</div>
+                <p id="productDescription">Описание товара</p>
+                <p id="productDetails">Детали товара</p>
+                <button class="buy-button" onclick="purchaseProduct()">Купить сейчас</button>
+                <button class="buy-button" style="background: var(--bg-secondary); color: var(--text-primary); border-color: var(--border);" 
+                        onclick="toggleFavorite()" id="favoriteButton">
+                    Добавить в избранное
+                </button>
+            </div>
+        </div>
+
+        <!-- Экран пополнения баланса -->
+        <div id="depositScreen" class="hidden">
+            <button class="back-button" onclick="showScreen('mainScreen')">← Назад</button>
+            <h2 style="margin-bottom: 20px;">Пополнение баланса</h2>
+            <div class="payment-methods">
+                <div class="payment-method" onclick="showCryptoPayment('TON')">
+                    <div class="payment-icon symbol-ton">TON</div>
+                    <div>
+                        <div style="font-weight: 600;">TON</div>
+                        <div style="font-size: 14px; color: var(--text-secondary);">The Open Network</div>
+                    </div>
+                </div>
+                <div class="payment-method" onclick="showCryptoPayment('USDT')">
+                    <div class="payment-icon symbol-usdt">USDT</div>
+                    <div>
+                        <div style="font-weight: 600;">USDT TRC20</div>
+                        <div style="font-size: 14px; color: var(--text-secondary);">Tron Network</div>
+                    </div>
+                </div>
+                <div class="payment-method" onclick="showCryptoPayment('LTC')">
+                    <div class="payment-icon symbol-ltc">LTC</div>
+                    <div>
+                        <div style="font-weight: 600;">LTC</div>
+                        <div style="font-size: 14px; color: var(--text-secondary);">Litecoin</div>
+                    </div>
+                </div>
+                <div class="payment-method" onclick="showCryptoPayment('BTC')">
+                    <div class="payment-icon symbol-btc">BTC</div>
+                    <div>
+                        <div style="font-weight: 600;">BTC</div>
+                        <div style="font-size: 14px; color: var(--text-secondary);">Bitcoin</div>
+                    </div>
+                </div>
+                <div class="payment-method" onclick="showCryptoPayment('SOL')">
+                    <div class="payment-icon symbol-sol">SOL</div>
+                    <div>
+                        <div style="font-weight: 600;">SOL</div>
+                        <div style="font-size: 14px; color: var(--text-secondary);">Solana</div>
+                    </div>
+                </div>
+                <div class="payment-method" onclick="showCryptoPayment('USDC')">
+                    <div class="payment-icon symbol-usdc">USDC</div>
+                    <div>
+                        <div style="font-weight: 600;">USDC</div>
+                        <div style="font-size: 14px; color: var(--text-secondary);">ERC20 Network</div>
+                    </div>
+                </div>
+                <div class="payment-method" onclick="showCryptoBotPayment()">
+                    <div class="payment-icon symbol-crypto-bot">CB</div>
+                    <div>
+                        <div style="font-weight: 600;">Crypto Bot</div>
+                        <div style="font-size: 14px; color: var(--text-secondary);">Рекомендуется</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Экран крипто-платежа -->
+        <div id="cryptoPaymentScreen" class="hidden">
+            <button class="back-button" onclick="showScreen('depositScreen')">← Назад</button>
+            <div class="product-card">
+                <h3 id="cryptoPaymentTitle">Пополнение через TON</h3>
+                <p style="margin-bottom: 16px;">Отправьте точную сумму на указанный адрес:</p>
+                <div class="wallet-address" id="walletAddress">
+                    Загрузка...
+                </div>
+                <button class="copy-button" onclick="copyWalletAddress()">Скопировать адрес</button>
+                <div style="margin-top: 20px; font-size: 14px; color: var(--text-secondary);">
+                    <p>⚠️ <b>Внимание:</b></p>
+                    <p>• Отправляйте только <b id="cryptoNetwork">TON</b></p>
+                    <p>• Убедитесь в правильности сети</p>
+                    <p>• Минимальная сумма: $10</p>
+                    <p>• После отправки баланс пополнится автоматически</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Экран Crypto Bot -->
+        <div id="cryptoBotScreen" class="hidden">
+            <button class="back-button" onclick="showScreen('depositScreen')">← Назад</button>
+            <div class="product-card">
+                <h3>Пополнение через Crypto Bot</h3>
+                <p style="margin-bottom: 12px;">Введите сумму для пополнения (от $10 до $1000):</p>
+                <input type="number" id="depositAmount" placeholder="Сумма в USD" 
+                       min="10" max="1000" step="0.01"
+                       style="margin-bottom: 16px;">
+                <button class="buy-button" onclick="createCryptoInvoice()">Создать счет для оплаты</button>
+            </div>
+        </div>
+
+        <!-- Другие экраны -->
+        <div id="favoritesScreen" class="hidden">
+            <button class="back-button" onclick="showScreen('mainScreen')">← Назад</button>
+            <h2 style="margin-bottom: 20px;">Избранное</h2>
+            <div class="products-grid" id="favoritesGrid"></div>
+        </div>
+
+        <div id="ordersScreen" class="hidden">
+            <button class="back-button" onclick="showScreen('mainScreen')">← Назад</button>
+            <h2 style="margin-bottom: 20px;">История заказов</h2>
+            <div class="products-grid" id="ordersGrid"></div>
+        </div>
+
+        <div id="referralScreen" class="hidden">
+            <button class="back-button" onclick="showScreen('mainScreen')">← Назад</button>
+            <div class="referral-section">
+                <h3>Реферальная система</h3>
+                <p style="margin-bottom: 16px;">Приглашайте друзей и получайте 10% от их пополнений!</p>
+                <div class="referral-link" id="referralLink">
+                    Загрузка...
+                </div>
+                <button class="copy-button" onclick="copyReferralLink()">Скопировать ссылку</button>
+                
+                <div style="margin-top: 24px;">
+                    <h4 style="margin-bottom: 12px;">Ваша статистика:</h4>
+                    <p>Приглашено пользователей: <b id="referralCount">0</b></p>
+                    <p>Заработано: <b id="referralEarnings">$0.00</b></p>
+                </div>
+            </div>
+        </div>
+
+        <div id="giveawayScreen" class="hidden">
+            <button class="back-button" onclick="showScreen('mainScreen')">← Назад</button>
+            <div class="product-card">
+                <h3>🎯 Розыгрыш 3x iPhone 17 Pro Max</h3>
+                <p style="margin-bottom: 16px;">Участвуйте в розыгрыше и выиграйте один из трех новейших iPhone!</p>
+                <div style="margin: 20px 0; padding: 16px; background: var(--bg-secondary); border-radius: 12px;">
+                    <p><b>Условия участия:</b></p>
+                    <p>• Общая сумма пополнений от $30</p>
+                    <p>• Активный аккаунт в боте</p>
+                    <p>• Участие бесплатное для подходящих пользователей</p>
+                </div>
+                <div id="giveawayStatus">
+                    <!-- Статус будет загружен через JS -->
+                </div>
+                <button class="buy-button" onclick="participateInGiveaway()" id="giveawayButton">
+                    Участвовать в розыгрыше
+                </button>
+            </div>
+        </div>
+
+        <div id="aboutScreen" class="hidden">
+            <button class="back-button" onclick="showScreen('mainScreen')">← Назад</button>
+            <div class="product-card">
+                <h3>О магазине Stoke Shop</h3>
+                <p style="margin-bottom: 16px;">Мы продаем качественные аккаунты с гарантией:</p>
+                <ul style="margin: 16px 0; padding-left: 20px; color: var(--text-secondary);">
+                    <li style="margin-bottom: 8px;">✅ Гарантия на все товары</li>
+                    <li style="margin-bottom: 8px;">⚡ Мгновенная доставка</li>
+                    <li style="margin-bottom: 8px;">🔒 Анонимная оплата криптовалютой</li>
+                    <li style="margin-bottom: 8px;">🛒 Простой процесс покупки</li>
+                </ul>
+                <p><b>Способы оплаты:</b></p>
+                <p style="margin-bottom: 16px;">TON, USDT, BTC, LTC, SOL, USDC, Crypto Bot</p>
+                <p><b>Надежный продавец с 2024 года</b></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Переключатель темы -->
+    <div class="theme-switcher" onclick="toggleTheme()" id="themeButton">
+        ☀️
+    </div>
+
+    <!-- Переключатель языка -->
+    <div class="language-switcher" onclick="toggleLanguage()">
+        🌐
+    </div>
+
+    <script>
+        let tg = window.Telegram.WebApp;
+        let currentLanguage = 'ru';
+        let currentTheme = 'dark';
+        let currentCategoryId = null;
+        let currentProductId = null;
+        let userData = null;
+        let categories = [];
+        let products = [];
+        let currentCryptoNetwork = '';
+        let currentWalletAddress = '';
+
+        // Инициализация
+        tg.expand();
+        tg.ready();
+
+        // Загрузка данных пользователя
+        async function loadUserData() {
+            try {
+                showLoading();
+                const response = await fetch(`https://your-server.com/api/user?user_id=${tg.initDataUnsafe.user.id}`);
+                userData = await response.json();
+                updateUI();
+                hideLoading();
+            } catch (error) {
+                console.error('Error loading user data:', error);
+                hideLoading();
+            }
+        }
+
+        // Загрузка категорий
+        async function loadCategories() {
+            try {
+                showLoading();
+                const response = await fetch(`https://your-server.com/api/categories?lang=${currentLanguage}`);
+                categories = await response.json();
+                displayCategories();
+                hideLoading();
+            } catch (error) {
+                console.error('Error loading categories:', error);
+                hideLoading();
+            }
+        }
+
+        // Загрузка товаров категории
+        async function loadProducts(categoryId) {
+            try {
+                showLoading();
+                const response = await fetch(`https://your-server.com/api/products?category_id=${categoryId}&lang=${currentLanguage}`);
+                products = await response.json();
+                displayProducts();
+                hideLoading();
+            } catch (error) {
+                console.error('Error loading products:', error);
+                hideLoading();
+            }
+        }
+
+        // Обновление интерфейса
+        function updateUI() {
+            if (userData) {
+                document.getElementById('balanceAmount').textContent = `$${userData.balance.toFixed(2)}`;
+                document.getElementById('referralLink').textContent = userData.referral_link;
+                document.getElementById('referralCount').textContent = userData.referral_count;
+                document.getElementById('referralEarnings').textContent = `$${userData.referral_earnings.toFixed(2)}`;
+                
+                updateGiveawayStatus();
+            }
+        }
+
+        // Отображение категорий с ахуительными символами
+        function displayCategories() {
+            const grid = document.getElementById('categoriesGrid');
+            grid.innerHTML = '';
+
+            const categorySymbols = {
+                1: { symbol: 'T', name: 'Telegram', class: 'symbol-telegram' },
+                2: { symbol: 'VK', name: 'ВКонтакте', class: 'symbol-vk' },
+                3: { symbol: 'V', name: 'Vinted', class: 'symbol-vinted' },
+                4: { symbol: 'W', name: 'Wallapop', class: 'symbol-wallapop' },
+                5: { symbol: 'F', name: 'Facebook', class: 'symbol-facebook' },
+                6: { symbol: 'S', name: 'Stars', class: 'symbol-stars' },
+                7: { symbol: 'P', name: 'Premium', class: 'symbol-premium' },
+                8: { symbol: 'Y', name: 'Yandex', class: 'symbol-yandex' },
+                9: { symbol: 'O', name: 'Ozon', class: 'symbol-ozon' },
+                10: { symbol: 'WB', name: 'Wildberries', class: 'symbol-wildberries' },
+                11: { symbol: 'G', name: 'Госуслуги', class: 'symbol-gosuslugi' }
+            };
+
+            categories.forEach(category => {
+                const symbolInfo = categorySymbols[category.id] || { symbol: '?', name: category.name, class: 'symbol-telegram' };
+                
+                const card = document.createElement('div');
+                card.className = 'category-card fade-in';
+                card.onclick = () => showCategoryProducts(category.id, category.name);
+                
+                card.innerHTML = `
+                    <div class="category-icon ${symbolInfo.class}">
+                        ${symbolInfo.symbol}
+                    </div>
+                    <div style="font-weight: 600;">${category.name}</div>
+                `;
+                
+                grid.appendChild(card);
+            });
+        }
+
+        // Отображение товаров
+        function displayProducts() {
+            const grid = document.getElementById('productsGrid');
+            grid.innerHTML = '';
+
+            products.forEach(product => {
+                const card = document.createElement('div');
+                card.className = 'product-card fade-in';
+                card.onclick = () => showProduct(product.id);
+                
+                card.innerHTML = `
+                    <div class="product-header">
+                        <h4 style="margin: 0;">${product.name}</h4>
+                        <div class="product-price">$${product.price}</div>
+                    </div>
+                    <div class="product-stock">В наличии: ${product.stock} шт.</div>
+                    <p style="color: var(--text-secondary); font-size: 14px; margin-top: 8px; line-height: 1.4;">${product.description}</p>
+                `;
+                
+                grid.appendChild(card);
+            });
+        }
+
+        // Показать товар
+        async function showProduct(productId) {
+            try {
+                showLoading();
+                const response = await fetch(`https://your-server.com/api/product/${productId}?lang=${currentLanguage}&user_id=${tg.initDataUnsafe.user.id}`);
+                const product = await response.json();
+                
+                currentProductId = productId;
+                
+                document.getElementById('productName').textContent = product.name;
+                document.getElementById('productPrice').textContent = `$${product.price}`;
+                document.getElementById('productStock').textContent = `В наличии: ${product.stock} шт.`;
+                document.getElementById('productDescription').textContent = product.description;
+                document.getElementById('productDetails').textContent = product.details;
+                
+                // Обновление кнопки избранного
+                const favoriteButton = document.getElementById('favoriteButton');
+                if (product.is_favorite) {
+                    favoriteButton.textContent = 'Удалить из избранного';
+                    favoriteButton.style.background = 'var(--danger)';
+                } else {
+                    favoriteButton.textContent = 'Добавить в избранное';
+                    favoriteButton.style.background = 'var(--bg-secondary)';
+                }
+                
+                showScreen('productScreen');
+                hideLoading();
+            } catch (error) {
+                console.error('Error loading product:', error);
+                hideLoading();
+            }
+        }
+
+        // Покупка товара
+        async function purchaseProduct() {
+            if (!currentProductId) return;
+
+            try {
+                const response = await fetch('https://your-server.com/api/purchase', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        user_id: tg.initDataUnsafe.user.id,
+                        product_id: currentProductId
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    alert('✅ Покупка успешно завершена! Данные аккаунта отправлены вам в боте.');
+                    showScreen('mainScreen');
+                    loadUserData();
+                } else {
+                    alert('❌ Ошибка: ' + result.error);
+                }
+            } catch (error) {
+                console.error('Error purchasing product:', error);
+                alert('❌ Ошибка при покупке товара');
+            }
+        }
+
+        // Добавление/удаление из избранного
+        async function toggleFavorite() {
+            if (!currentProductId) return;
+
+            try {
+                const response = await fetch('https://your-server.com/api/toggle-favorite', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        user_id: tg.initDataUnsafe.user.id,
+                        product_id: currentProductId
+                    })
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    const favoriteButton = document.getElementById('favoriteButton');
+                    if (result.is_favorite) {
+                        favoriteButton.textContent = 'Удалить из избранного';
+                        favoriteButton.style.background = 'var(--danger)';
+                    } else {
+                        favoriteButton.textContent = 'Добавить в избранное';
+                        favoriteButton.style.background = 'var(--bg-secondary)';
+                    }
+                }
+            } catch (error) {
+                console.error('Error toggling favorite:', error);
+            }
+        }
+
+        // Показать крипто-платеж
+        async function showCryptoPayment(network) {
+            try {
+                showLoading();
+                const response = await fetch(`https://your-server.com/api/wallet-address?network=${network}`);
+                const data = await response.json();
+
+                document.getElementById('cryptoPaymentTitle').textContent = `Пополнение через ${network}`;
+                document.getElementById('walletAddress').textContent = data.address;
+                document.getElementById('cryptoNetwork').textContent = network;
+
+                currentCryptoNetwork = network;
+                currentWalletAddress = data.address;
+
+                showScreen('cryptoPaymentScreen');
+                hideLoading();
+            } catch (error) {
+                console.error('Error loading wallet address:', error);
+                hideLoading();
+            }
+        }
+
+        // Копирование адреса кошелька
+        async function copyWalletAddress() {
+            try {
+                await navigator.clipboard.writeText(currentWalletAddress);
+                alert('✅ Адрес скопирован в буфер обмена!');
+            } catch (error) {
+                console.error('Error copying address:', error);
+                alert('❌ Ошибка при копировании');
+            }
+        }
+
+        // Создание инвойса Crypto Bot
+        async function createCryptoInvoice() {
+            const amount = document.getElementById('depositAmount').value;
+            
+            if (!amount || amount < 10 || amount > 1000) {
+                alert('❌ Введите сумму от $10 до $1000');
+                return;
+            }
+
+            try {
+                const response = await fetch('https://your-server.com/api/create-invoice', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        user_id: tg.initDataUnsafe.user.id,
+                        amount: parseFloat(amount)
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    tg.openInvoice(result.pay_url, (status) => {
+                        if (status === 'paid') {
+                            alert('✅ Оплата прошла успешно! Баланс пополнен.');
+                            showScreen('mainScreen');
+                            loadUserData();
+                        }
+                    });
+                } else {
+                    alert('❌ Ошибка при создании счета: ' + result.error);
+                }
+            } catch (error) {
+                console.error('Error creating invoice:', error);
+                alert('❌ Ошибка при создании счета');
+            }
+        }
+
+        // Участие в розыгрыше
+        async function participateInGiveaway() {
+            try {
+                const response = await fetch('https://your-server.com/api/participate-giveaway', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        user_id: tg.initDataUnsafe.user.id
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    alert('✅ Вы успешно зарегистрированы в розыгрыше!');
+                    updateGiveawayStatus();
+                } else {
+                    alert('❌ Ошибка: ' + result.error);
+                }
+            } catch (error) {
+                console.error('Error participating in giveaway:', error);
+            }
+        }
+
+        // Обновление статуса розыгрыша
+        function updateGiveawayStatus() {
+            const statusDiv = document.getElementById('giveawayStatus');
+            const button = document.getElementById('giveawayButton');
+
+            if (userData) {
+                if (userData.giveaway_participating) {
+                    statusDiv.innerHTML = '<p style="color: var(--success); font-weight: 600;">✅ Вы уже участвуете в розыгрыше!</p>';
+                    button.style.display = 'none';
+                } else if (userData.total_deposits >= 30) {
+                    statusDiv.innerHTML = '<p style="color: var(--warning); font-weight: 600;">✅ Вы можете участвовать в розыгрыше</p>';
+                    button.style.display = 'block';
+                } else {
+                    const needed = 30 - userData.total_deposits;
+                    statusDiv.innerHTML = `<p style="color: var(--danger); font-weight: 600;">❌ Для участия нужно пополнить еще $${needed.toFixed(2)}</p>`;
+                    button.style.display = 'none';
+                }
+            }
+        }
+
+        // Копирование реферальной ссылки
+        async function copyReferralLink() {
+            try {
+                await navigator.clipboard.writeText(userData.referral_link);
+                alert('✅ Реферальная ссылка скопирована!');
+            } catch (error) {
+                console.error('Error copying referral link:', error);
+                alert('❌ Ошибка при копировании');
+            }
+        }
+
+        // Переключение темы
+        function toggleTheme() {
+            currentTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.body.setAttribute('data-theme', currentTheme);
+            
+            const themeButton = document.getElementById('themeButton');
+            themeButton.textContent = currentTheme === 'dark' ? '☀️' : '🌙';
+            
+            // Сохраняем в localStorage
+            localStorage.setItem('theme', currentTheme);
+        }
+
+        // Переключение языка
+        function toggleLanguage() {
+            currentLanguage = currentLanguage === 'ru' ? 'en' : 'ru';
+            // Здесь можно добавить смену языка интерфейса
+            loadCategories();
+        }
+
+        // Управление экранами
+        function showScreen(screenId) {
+            document.querySelectorAll('div[id$="Screen"]').forEach(screen => {
+                screen.classList.add('hidden');
+            });
+            document.getElementById(screenId).classList.remove('hidden');
+        }
+
+        function showCategoryProducts(categoryId, categoryName) {
+            currentCategoryId = categoryId;
+            document.getElementById('categoryTitle').textContent = categoryName;
+            loadProducts(categoryId);
+            showScreen('productsScreen');
+        }
+
+        function goBackToProducts() {
+            showScreen('productsScreen');
+        }
+
+        function showCryptoBotPayment() {
+            showScreen('cryptoBotScreen');
+        }
+
+        // Вспомогательные функции
+        function showLoading() {
+            // Можно добавить индикатор загрузки
+        }
+
+        function hideLoading() {
+            // Скрыть индикатор загрузки
+        }
+
+        // Инициализация при загрузке
+        document.addEventListener('DOMContentLoaded', () => {
+            // Загружаем сохраненную тему
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            currentTheme = savedTheme;
+            document.body.setAttribute('data-theme', currentTheme);
+            
+            const themeButton = document.getElementById('themeButton');
+            themeButton.textContent = currentTheme === 'dark' ? '☀️' : '🌙';
+            
+            loadUserData();
+            loadCategories();
+        });
+    </script>
+</body>
+</html>
