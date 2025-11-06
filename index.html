@@ -1577,46 +1577,80 @@
         };
 
         // Crypto Pay API Configuration - ИНТЕГРАЦИЯ С ВАШИМ БОТОМ
-        const CRYPTO_PAY_API = {
-            baseUrl: 'https://stokeshop.vercel.app', // Замените на ваш домен
-            createInvoice: async function(amount, currency = 'USD', description = 'Пополнение баланса') {
-                try {
-                    const userId = getUserId();
-                    const response = await fetch(`${this.baseUrl}/create-invoice`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            user_id: userId,
-                            amount: amount,
-                            currency: currency,
-                            description: description
-                        })
-                    });
-                    
-                    const data = await response.json();
-                    console.log('Invoice created:', data);
-                    return data.success ? data : null;
-                } catch (error) {
-                    console.error('Error creating invoice:', error);
-                    return null;
-                }
-            },
+        // Crypto Pay API Configuration - ИНТЕГРАЦИЯ С ВАШИМ PYTHON БОТОМ
+const CRYPTO_PAY_API = {
+    // Используем тот же токен, что и в Python боте
+    token: '477613:AAJXN238rLjxk7pP2L6DA7tNnnrYQ8V4BBE',
+    baseUrl: 'https://pay.crypt.bot/api',
+    
+    createInvoice: async function(amount, currency = 'USD', description = 'Пополнение баланса') {
+        try {
+            const response = await fetch(`${this.baseUrl}/createInvoice`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Crypto-Pay-API-Token': this.token
+                },
+                body: JSON.stringify({
+                    amount: amount,
+                    asset: 'USDT',
+                    description: description,
+                    hidden_message: `${currentLanguage === 'ru' ? 'Пополнение баланса на' : 'Balance top-up for'} $${amount}`,
+                    paid_btn_name: 'open',
+                    paid_btn_url: 'https://t.me/cryptosending_bot',
+                    payload: JSON.stringify({
+                        userId: getUserId(),
+                        type: 'deposit',
+                        amount: amount
+                    })
+                })
+            });
             
-            checkPayment: async function(invoiceId) {
-                try {
-                    const response = await fetch(`${this.baseUrl}/check-payment?invoice_id=${invoiceId}`);
-                    const data = await response.json();
-                    return data;
-                } catch (error) {
-                    console.error('Error checking payment:', error);
-                    return null;
-                }
+            const data = await response.json();
+            console.log('Invoice created:', data);
+            return data.ok ? data.result : null;
+        } catch (error) {
+            console.error('Error creating invoice:', error);
+            return null;
+        }
+    },
+    
+    getInvoices: async function(invoice_ids = []) {
+        try {
+            const response = await fetch(`${this.baseUrl}/getInvoices`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Crypto-Pay-API-Token': this.token
+                },
+                body: JSON.stringify({
+                    invoice_ids: invoice_ids
+                })
+            });
+            
+            const data = await response.json();
+            return data.ok ? data.result : null;
+        } catch (error) {
+            console.error('Error getting invoices:', error);
+            return null;
+        }
+    },
+    
+    checkPayment: async function(invoiceId) {
+        try {
+            const invoices = await this.getInvoices([invoiceId]);
+            if (invoices && invoices.items && invoices.items.length > 0) {
+                const invoice = invoices.items[0];
+                return invoice.status === 'paid';
             }
-        };
-
-        // Crypto addresses for direct payments
+            return false;
+        } catch (error) {
+            console.error('Error checking payment:', error);
+            return false;
+        }
+    }
+};
+ // Crypto addresses for direct payments
         const CRYPTO_ADDRESSES = {
             'TON': 'UQBvrPItSxKL-U2ikxdIYz3zWRCPlxMBaz3zVCHrLmD2OPOR',
             'USDT': 'TXdf14ohPHQsysio6VGQCdFyP9nVdYcbbt',
